@@ -1,9 +1,11 @@
 from django.contrib import admin
 
 
-from .models import Readings
+from .models import ReadingsSensor, ReadingsPower
 
 
-admin.site.register(Readings)
+admin.site.register(ReadingsSensor)
+admin.site.register(ReadingsPower)
+
 
 

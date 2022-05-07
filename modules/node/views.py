@@ -14,7 +14,7 @@ from rest_framework.request import Request
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, get_list_or_404
 from modules.node.models import Nodes
-from modules.read.models import Readings
+from modules.read.models import ReadingsSensor, ReadingsSensor
 from modules.serializers import NodeCreateSerializer, NodeListSerializer, NodeRetrieveSerializer
 
 class NodesViewSets(viewsets.ViewSet):
@@ -22,7 +22,7 @@ class NodesViewSets(viewsets.ViewSet):
 	permission_classes      =   [IsAuthenticated]
 
 	def list(self, request):
-		time.sleep(0.500)
+		time.sleep(1)
 		qaction = request.GET.get('action', 'lister')
 		qfilter = request.GET.get('filter', 'list-nodes')
 		nodes = {}
@@ -31,7 +31,7 @@ class NodesViewSets(viewsets.ViewSet):
 				nodes = Nodes.objects.all().order_by('-created_at')
 			elif qfilter == 'active-nodes':
 				time_threshold = datetime.datetime.now(tz=timezone.utc) - datetime.timedelta(minutes=3)
-				reads = Readings.objects.filter(created_at__gt=time_threshold).values_list('node_id', flat=True).distinct('node_id')
+				reads = ReadingsSensor.objects.filter(created_at__gt=time_threshold).values_list('node_id', flat=True).distinct('node_id')
 				nodes = Nodes.objects.filter(id__in=reads)
 		elif qaction == 'finder':
 			qstring = request.GET.get('queryString', '')
