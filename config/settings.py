@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'modules.node',
     'modules.read',
+    'modules.note',
     'modules.user'
 ]  
 

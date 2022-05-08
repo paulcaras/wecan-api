@@ -3,6 +3,7 @@ from django.db.models import Q
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from modules.node.models import Nodes
 from modules.read.models import ReadingsSensor, ReadingsPower
+from modules.note.models import Notifications
 from modules.user.models import Staffs
 
 
@@ -125,7 +126,6 @@ class ReadingSensorListSerializer(ModelSerializer):
 				self.fields.pop(field_name)
 
 	node 				= 	SerializerMethodField('get_node')
-	#Reading 				= 	SerializerMethodField('get_Reading')
 
 	def get_node(self, obj):
 		request 			= 	self.context.get('request')
@@ -182,6 +182,40 @@ class ReadingPowerCreateSerializer(ModelSerializer):
 		model 		= 	ReadingsPower
 		exclude 	= 	['created_at','updated_at']
 
+
+
+class NotificationListSerializer(ModelSerializer):
+	def __init__(self, *args, **kwargs):
+		request = kwargs.get('context', {}).get('request')
+		str_fields = request.GET.get('note_fields', '') if request else None
+		fields = str_fields.split(',') if str_fields else None
+		super(self.__class__, self).__init__(*args, **kwargs)
+		if fields is not None:
+			allowed = set(fields)
+			existing = set(self.fields)
+			for field_name in existing - allowed:
+				self.fields.pop(field_name)
+
+	read 				= 	SerializerMethodField('get_read')
+
+	def get_read(self, obj):
+		request 			= 	self.context.get('request')
+		serializer_context 	= 	{'request': request }
+		notes 				=	ReadingsSenor.objects.get(pk=obj.read.id)
+		serializer 			= 	ReadingSensorListSerializer(notes, context=serializer_context)
+		return serializer.data
+
+
+	class Meta:
+		model 		= 	Notifications
+		fields 		= 	'__all__'
+
+
+
+class NotificationCreateSerializer(ModelSerializer):
+	class Meta:
+		model 		= 	Notifications
+		exclude 	= 	['created_at','updated_at']
 
 
 class StaffLoginSerializer(ModelSerializer):

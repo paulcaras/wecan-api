@@ -6,11 +6,13 @@ from django.contrib.auth.models import User
 from rest_framework import serializers, viewsets, routers
 
 from modules.node.views import NodesViewSets, node_auth, node_list, node_last
+from modules.note.views import NotesViewSets
 from modules.read.views import ReadingSensorViewSets, ReadingPowerViewSets, read_sensor_post, read_power_post
 from modules.user.views import staff_login, index_page, token_verify
 
 router = routers.DefaultRouter()
 router.register(r'node', NodesViewSets, basename='nodes')
+router.register(r'note', NotesViewSets, basename='notes')
 router.register(r'read_sensor', ReadingSensorViewSets, basename='readings_sensor')
 router.register(r'read_power', ReadingPowerViewSets, basename='readings_power')
 
