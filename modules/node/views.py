@@ -75,36 +75,17 @@ class NodesViewSets(viewsets.ViewSet):
 		pass
 
 
-@csrf_exempt
-@api_view(['GET'])
+
+@api_view(['POST'])
 @permission_classes([AllowAny])
-def node_auth(request, format=None):
-	if request.GET.get('nid') is not None:
-		qstring = request.GET.get('nid')
+def node_maps(request, format=None):
+	if request.data['coord_lat'] > 0 and request.data['coord_lng'] > 0:
 		try:
-			nodes = Nodes.objects.get(chipid__exact=int(qstring))
-			serializers = NodeListSerializer(nodes, context={'request':request})
-			return Response(serializers.data)
+			node = Nodes.objects.filter(c_id=request.data['c_id']).update(
+						coord_lat=request.data['coord_lat'],
+						coord_lng=request.data['coord_lng']
+					)
+			return Response(status=status.HTTP_200_OK)
 		except:
 			pass
-	return Response(status=status.HTTP_404_NOT_FOUND)
-
-
-@csrf_exempt
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def node_list(request, format=None):
-	qnid = request.GET.get('nid')
-	nodes = Nodes.objects.filter(chipid__exact=int(qnid))[0]
-	serializers = NodeRetrieveSerializer(nodes, context={'request':request})
-	return Response(serializers.data)
-
-
-@csrf_exempt
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def node_last(request, format=None):
-	qnid = request.GET.get('nid')
-	nodes = Nodes.objects.filter(chipid__exact=int(qnid)).order_by('-created_at')[0]
-	serializers = NodeRetrieveSerializer(nodes, context={'request':request})
-	return Response(serializers.data)
+	return Response(status=status.HTTP_400_BAD_REQUEST)

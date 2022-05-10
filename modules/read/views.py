@@ -1,6 +1,7 @@
 import json
 import time
 import datetime
+import decimal
 from django.utils import timezone
 from django.db.models import Q
 from django.http import HttpResponse
@@ -14,8 +15,9 @@ from rest_framework.request import Request
 #from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404, get_list_or_404
 from modules.read.models import ReadingsSensor, ReadingsPower
-from modules.serializers import ReadingSensorCreateSerializer, ReadingSensorListSerializer, ReadingPowerCreateSerializer, ReadingPowerListSerializer
 from modules.node.models import Nodes
+from modules.note.models import Notifications
+from modules.serializers import ReadingSensorCreateSerializer, ReadingSensorListSerializer, ReadingPowerCreateSerializer, ReadingPowerListSerializer, NotificationCreateSerializer
 
 
 class ReadingSensorViewSets(viewsets.ViewSet):
@@ -120,13 +122,21 @@ class ReadingPowerViewSets(viewsets.ViewSet):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def read_sensor_post(request, format=None):
-	#print(request.data['c_id'])
-	node = Nodes.objects.get(chipid=request.data['c_id'])
+	node = Nodes.objects.get(c_id=request.data['c_id'])
 	if node is not None:
-		parse_data = { 'node': node.id, 'temperature': round(request.data['temp'],2), 'turbidity': round(request.data['turb'],2), 'ph_level': round(request.data['acid'],2) }
+		parse_data = { 'node': node.id, 'dust': round(request.data['dust'],2) }
 		serializer = ReadingSensorCreateSerializer(data=parse_data)
 		if serializer.is_valid():
-			serializer.save()
+			read = serializer.save()
+			notif = { 'read': 0 }
+			if float(parse_data['dust']) <= node.bin_offset:
+				notif = { 'read': read.id, 'note_type': 1 }
+			elif parse_data['dust'] >= (float(node.bin_height)*float(0.9)):
+				notif = { 'read': read.id, 'note_type': 2 }
+			if notif['read'] > 0:
+				notifs = NotificationCreateSerializer(data=notif)
+				if notifs.is_valid():
+					notifs.save()
 			return Response(status=status.HTTP_200_OK)
 	return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -135,10 +145,9 @@ def read_sensor_post(request, format=None):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def read_power_post(request, format=None):
-	#print(request.data['c_id'])
-	node = Nodes.objects.get(chipid=request.data['c_id'])
+	node = Nodes.objects.get(c_id=request.data['c_id'])
 	if node is not None:
-		parse_data = { 'node': node.id, 'temperature': round(request.data['temp'],2), 'turbidity': round(request.data['turb'],2), 'ph_level': round(request.data['acid'],2) }
+		parse_data = { 'node': node.id, 'power_in': round(request.data['p_in'],2), 'power_ex': round(request.data['p_ex'],2) }
 		serializer = ReadingPowerCreateSerializer(data=parse_data)
 		if serializer.is_valid():
 			serializer.save()

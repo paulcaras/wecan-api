@@ -2,7 +2,7 @@ import json
 import time
 import datetime
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import HttpResponse
 from rest_framework.decorators import api_view, renderer_classes, permission_classes
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
@@ -23,10 +23,13 @@ class NotesViewSets(viewsets.ViewSet):
 
 	def list(self, request):
 		time.sleep(1)
-		qaction = request.GET.get('action', 'lister')
+		qaction 			= 	request.GET.get('action', 'lister')
+		listerStart 		= 	int(request.GET.get('listerStart', 0))
+		listerLimit 		= 	int(request.GET.get('listerLimit', 8))
+		offset 				= 	listerStart*listerLimit
 		notes = {}
 		if qaction == 'lister':
-			notes = Notifications.objects.all().order_by('-created_at')
+			notes = Notifications.objects.all().order_by('-added_at')[offset:offset+listerLimit]
 		serializers = NotificationListSerializer(notes, many=True, context={'request':request})
 		return Response(serializers.data)
 

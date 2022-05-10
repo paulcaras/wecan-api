@@ -20,7 +20,7 @@ class ReadingsSensor(models.Model):
 class ReadingsPower(models.Model):
 	node 				=	models.ForeignKey(Nodes, on_delete=models.SET_NULL, related_name='node_power', null=True)	
 	power_in			=	models.DecimalField(decimal_places=2, max_digits=8)
-	power_out			=	models.DecimalField(decimal_places=2, max_digits=8)
+	power_ex			=	models.DecimalField(decimal_places=2, max_digits=8)
 	created_at 			= 	models.DateTimeField(auto_now_add=True, blank=True, null=True)
 	updated_at 			= 	models.DateTimeField(auto_now=True, blank=True, null=True)
 

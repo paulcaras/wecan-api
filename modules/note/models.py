@@ -10,6 +10,7 @@ class Notifications(models.Model):
 	read				= 	models.ForeignKey(ReadingsSensor, on_delete=models.SET_NULL, related_name='note_sensor', null=True)	
 	note_type			=	models.CharField(max_length=1, choices=NOTE_TYPE, blank=True, default=1)
 	is_viewed			= 	models.BooleanField(blank=True, default=False)
+	added_at 			= 	models.DateField(auto_now_add=True, blank=True, null=True)
 	created_at 			= 	models.DateTimeField(auto_now_add=True, blank=True, null=True)
 	updated_at 			= 	models.DateTimeField(auto_now=True, blank=True, null=True)
 

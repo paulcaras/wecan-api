@@ -20,27 +20,27 @@ class NodeListSerializer(ModelSerializer):
 				self.fields.pop(field_name)
 
 	read_sensor 			= 	SerializerMethodField('get_read_sensor')
-	read_power 				= 	SerializerMethodField('get_read_sensor')
+	read_power 				= 	SerializerMethodField('get_read_power')
 
 	def get_read_sensor(self, obj):
 		request 			= 	self.context.get('request')
 		listerStart 		= 	int(request.GET.get('listerStart1', 0))
 		listerLimit 		= 	int(request.GET.get('listerLimit1', 50))
 		offset 				= 	listerStart*listerLimit
-		qfilter1 			= 	request.GET.get('filter1', 'with-last-read')
+		qfilter1 			= 	request.GET.get('subFilter', 'with-last-read')
 		is_many				=	False
 		readings 			= 	[]
 		if qfilter1 == 'with-all-read':
 			is_many			=	True
 			readings 			=	ReadingsSensor.objects.filter(node=obj).order_by('-created_at')[offset:offset+listerLimit]
 		else:
-			readings 			=	ReadingsSensor.objects.filter(node=obj).order_by('-created_at').first()
+			try:
+				readings 			=	ReadingsSensor.objects.filter(node=obj).order_by('-created_at').first()
+			except:
+				readings = {}
 		serializer_context 	= 	{'request': request }
 		serializer 			= 	ReadingSensorListSerializer(readings, many=is_many, context=serializer_context)
 		return serializer.data
-
-
-	read_power 				= 	SerializerMethodField('get_read_sensor')
 
 	def get_read_power(self, obj):
 		request 			= 	self.context.get('request')
@@ -53,7 +53,10 @@ class NodeListSerializer(ModelSerializer):
 			is_many			=	True
 			readings 			=	ReadingsPower.objects.filter(node=obj).order_by('-created_at')[offset:offset+listerLimit]
 		else:
-			readings 			=	ReadingsPower.objects.filter(node=obj).order_by('-created_at').first()
+			try:
+				readings 			=	ReadingsPower.objects.filter(node=obj).order_by('-created_at').first()
+			except:
+				readings = {}
 		serializer_context 	= 	{'request': request }
 		serializer 			= 	ReadingPowerListSerializer(readings, many=is_many, context=serializer_context)
 		return serializer.data
@@ -83,28 +86,47 @@ class NodeRetrieveSerializer(ModelSerializer):
 			for field_name in existing - allowed:
 				self.fields.pop(field_name)
 
-	read 				= 	SerializerMethodField('get_read')
+	read_sensor 			= 	SerializerMethodField('get_read_sensor')
+	read_power 				= 	SerializerMethodField('get_read_power')
 
-	def get_read(self, obj):
+	def get_read_sensor(self, obj):
 		request 			= 	self.context.get('request')
-		listerStart 		= 	int(request.GET.get('listerStart', 0))
-		listerLimit 		= 	int(request.GET.get('listerLimit', 25))
+		listerStart 		= 	int(request.GET.get('listerStart1', 0))
+		listerLimit 		= 	int(request.GET.get('listerLimit1', 50))
 		offset 				= 	listerStart*listerLimit
-		qstring 			= 	request.GET.get('queryString', '')
-		action 				= 	request.GET.get('action', 'list-reading')
-		readings 			= 	{}
-		many 				=	True
-		if action == 'list-reading':
-			readings 			=	Readings.objects.filter(node=obj).order_by('-created_at')[offset:offset+listerLimit]
-		elif action == 'date-reading':
-			d 					= 	qstring.split('-')
-			readings 			=	Readings.objects.filter(node=obj, created_at__gte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 0, 0, 0), created_at__lte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 23, 59, 59)).order_by('-created_at')[offset:offset+listerLimit]	
+		qfilter1 			= 	request.GET.get('subFilter', 'with-last-read')
+		is_many				=	False
+		readings 			= 	[]
+		if qfilter1 == 'with-all-read':
+			is_many			=	True
+			readings 			=	ReadingsSensor.objects.filter(node=obj).order_by('-created_at')[offset:offset+listerLimit]
 		else:
-			readings 			=	Readings.objects.filter(node=obj).order_by('-created_at')[0]
-			many 				= 	False
-		
+			try:
+				readings 			=	ReadingsSensor.objects.filter(node=obj).order_by('-created_at').first()
+			except:
+				readings = {}
 		serializer_context 	= 	{'request': request }
-		serializer 			= 	ReadingListSerializer(readings, many=many, context=serializer_context)
+		serializer 			= 	ReadingSensorListSerializer(readings, many=is_many, context=serializer_context)
+		return serializer.data
+
+
+	def get_read_power(self, obj):
+		request 			= 	self.context.get('request')
+		listerStart 		= 	int(request.GET.get('listerStart1', 0))
+		listerLimit 		= 	int(request.GET.get('listerLimit1', 50))
+		offset 				= 	listerStart*listerLimit
+		qfilter1 			= 	request.GET.get('subFilter', 'with-last-read')
+		is_many				=	False
+		if qfilter1 == 'with-all-read':
+			is_many			=	True
+			readings 			=	ReadingsPower.objects.filter(node=obj).order_by('-created_at')[offset:offset+listerLimit]
+		else:
+			try:
+				readings 			=	ReadingsPower.objects.filter(node=obj).order_by('-created_at').first()
+			except:
+				readings = {}
+		serializer_context 	= 	{'request': request }
+		serializer 			= 	ReadingPowerListSerializer(readings, many=is_many, context=serializer_context)
 		return serializer.data
 
 	class Meta:
@@ -201,8 +223,8 @@ class NotificationListSerializer(ModelSerializer):
 	def get_read(self, obj):
 		request 			= 	self.context.get('request')
 		serializer_context 	= 	{'request': request }
-		notes 				=	ReadingsSenor.objects.get(pk=obj.read.id)
-		serializer 			= 	ReadingSensorListSerializer(notes, context=serializer_context)
+		reading 			=	ReadingsSensor.objects.get(pk=obj.read.id)
+		serializer 			= 	ReadingSensorListSerializer(reading, context=serializer_context)
 		return serializer.data
 
 
