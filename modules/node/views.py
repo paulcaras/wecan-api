@@ -79,11 +79,11 @@ class NodesViewSets(viewsets.ViewSet):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def node_maps(request, format=None):
-	if request.data['coord_lat'] > 0 and request.data['coord_lng'] > 0:
+	if request.data['lat'] > 0 and request.data['lng'] > 0:
 		try:
 			node = Nodes.objects.filter(c_id=request.data['c_id']).update(
-						coord_lat=request.data['coord_lat'],
-						coord_lng=request.data['coord_lng']
+						coord_lat=request.data['lat'],
+						coord_lng=request.data['lng']
 					)
 			return Response(status=status.HTTP_200_OK)
 		except:
