@@ -32,7 +32,8 @@ class ReadingSensorViewSets(viewsets.ViewSet):
 		qstring 			= 	request.GET.get('queryString', '')
 		reads 				=	{}
 		if len(qstring) > 0:
-			reads 			=   ReadingsSensor.objects.filter(created_at__icontains=qstring).order_by('-created_at')[offset:offset+listerLimit]	
+			d = qstring.split('-')
+			reads 			=   ReadingsSensor.objects.filter(created_at__gte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 0, 0, 0), created_at__lte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 23, 59, 59)).order_by('-created_at')[offset:offset+listerLimit]	
 		else:
 			reads 				=    ReadingsSensor.objects.filter().order_by("-created_at")[offset:offset+listerLimit]
 		serializers		    = 	ReadingSensorListSerializer(reads, many=True, context={'request':request})

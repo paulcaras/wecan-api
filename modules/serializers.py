@@ -28,11 +28,16 @@ class NodeListSerializer(ModelSerializer):
 		listerLimit 		= 	int(request.GET.get('listerLimit1', 50))
 		offset 				= 	listerStart*listerLimit
 		qfilter1 			= 	request.GET.get('subFilter', 'with-last-read')
+		qstring 			= 	request.GET.get('queryString', '')
 		is_many				=	False
 		readings 			= 	[]
 		if qfilter1 == 'with-all-read':
 			is_many			=	True
-			readings 			=	ReadingsSensor.objects.filter(node=obj).order_by('-created_at')[offset:offset+listerLimit]
+			if len(qstring) > 0:
+				d 			= 	qstring.split('-')
+				readings 			=	ReadingsSensor.objects.filter(node=obj, created_at__gte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 0, 0, 0), created_at__lte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 23, 59, 59)).order_by('-created_at')[offset:offset+listerLimit]
+			else:
+				readings 			=	ReadingsSensor.objects.filter(node=obj).order_by('-created_at')[offset:offset+listerLimit]
 		else:
 			try:
 				readings 			=	ReadingsSensor.objects.filter(node=obj).order_by('-created_at').first()
@@ -47,11 +52,16 @@ class NodeListSerializer(ModelSerializer):
 		listerStart 		= 	int(request.GET.get('listerStart1', 0))
 		listerLimit 		= 	int(request.GET.get('listerLimit1', 50))
 		offset 				= 	listerStart*listerLimit
-		qfilter1 			= 	request.GET.get('filter1', 'with-last-read')
+		qfilter1 			= 	request.GET.get('subFilter', 'with-last-read')
+		qstring 			= 	request.GET.get('queryString', '')
 		is_many				=	False
 		if qfilter1 == 'with-all-read':
 			is_many			=	True
-			readings 			=	ReadingsPower.objects.filter(node=obj).order_by('-created_at')[offset:offset+listerLimit]
+			if len(qstring) > 0:
+				d 			= 	qstring.split('-')
+				readings 			=	ReadingsPower.objects.filter(node=obj, created_at__gte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 0, 0, 0), created_at__lte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 23, 59, 59)).order_by('-created_at')[offset:offset+listerLimit]
+			else:
+				readings 			=	ReadingsPower.objects.filter(node=obj).order_by('-created_at')[offset:offset+listerLimit]
 		else:
 			try:
 				readings 			=	ReadingsPower.objects.filter(node=obj).order_by('-created_at').first()
@@ -95,11 +105,16 @@ class NodeRetrieveSerializer(ModelSerializer):
 		listerLimit 		= 	int(request.GET.get('listerLimit1', 50))
 		offset 				= 	listerStart*listerLimit
 		qfilter1 			= 	request.GET.get('subFilter', 'with-last-read')
+		qstring 			= 	request.GET.get('queryString', '')
 		is_many				=	False
 		readings 			= 	[]
 		if qfilter1 == 'with-all-read':
 			is_many			=	True
-			readings 			=	ReadingsSensor.objects.filter(node=obj).order_by('-created_at')[offset:offset+listerLimit]
+			if len(qstring) > 0:
+				d 			= 	qstring.split('-')
+				readings 			=	ReadingsSensor.objects.filter(node=obj, created_at__gte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 0, 0, 0), created_at__lte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 23, 59, 59)).order_by('-created_at')[offset:offset+listerLimit]
+			else:
+				readings 			=	ReadingsSensor.objects.filter(node=obj).order_by('-created_at')[offset:offset+listerLimit]
 		else:
 			try:
 				readings 			=	ReadingsSensor.objects.filter(node=obj).order_by('-created_at').first()
@@ -109,17 +124,21 @@ class NodeRetrieveSerializer(ModelSerializer):
 		serializer 			= 	ReadingSensorListSerializer(readings, many=is_many, context=serializer_context)
 		return serializer.data
 
-
 	def get_read_power(self, obj):
 		request 			= 	self.context.get('request')
 		listerStart 		= 	int(request.GET.get('listerStart1', 0))
 		listerLimit 		= 	int(request.GET.get('listerLimit1', 50))
 		offset 				= 	listerStart*listerLimit
 		qfilter1 			= 	request.GET.get('subFilter', 'with-last-read')
+		qstring 			= 	request.GET.get('queryString', '')
 		is_many				=	False
 		if qfilter1 == 'with-all-read':
 			is_many			=	True
-			readings 			=	ReadingsPower.objects.filter(node=obj).order_by('-created_at')[offset:offset+listerLimit]
+			if len(qstring) > 0:
+				d 			= 	qstring.split('-')
+				readings 			=	ReadingsPower.objects.filter(node=obj, created_at__gte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 0, 0, 0), created_at__lte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 23, 59, 59)).order_by('-created_at')[offset:offset+listerLimit]
+			else:
+				readings 			=	ReadingsPower.objects.filter(node=obj).order_by('-created_at')[offset:offset+listerLimit]
 		else:
 			try:
 				readings 			=	ReadingsPower.objects.filter(node=obj).order_by('-created_at').first()
