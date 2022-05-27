@@ -123,6 +123,7 @@ class ReadingPowerViewSets(viewsets.ViewSet):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def read_sensor_post(request, format=None):
+	print(request.data)
 	node = Nodes.objects.get(c_id=request.data['c_id'])
 	if node is not None:
 		parse_data = { 'node': node.id, 'dust': round(request.data['dust'],2) }
@@ -146,6 +147,7 @@ def read_sensor_post(request, format=None):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def read_power_post(request, format=None):
+	print(request.data)
 	node = Nodes.objects.get(c_id=request.data['c_id'])
 	if node is not None:
 		parse_data = { 'node': node.id, 'power_in': round(request.data['p_in'],2), 'power_ex': round(request.data['p_ex'],2) }
