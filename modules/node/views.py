@@ -75,7 +75,7 @@ class NodesViewSets(viewsets.ViewSet):
 		pass
 
 
-
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def node_maps(request, format=None):

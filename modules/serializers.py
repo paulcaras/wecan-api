@@ -35,7 +35,8 @@ class NodeListSerializer(ModelSerializer):
 			is_many			=	True
 			if len(qstring) > 0:
 				d 			= 	qstring.split('-')
-				readings 			=	ReadingsSensor.objects.filter(node=obj, created_at__gte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 0, 0, 0), created_at__lte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 23, 59, 59)).order_by('-created_at')[offset:offset+listerLimit]
+				mos 		= 	int(d[1])+1
+				readings 			=	ReadingsSensor.objects.filter(node=obj, created_at__gte=datetime.datetime(int(d[0]), mos, int(d[2]), 0, 0, 0), created_at__lte=datetime.datetime(int(d[0]), mos, int(d[2]), 23, 59, 59)).order_by('-created_at')[offset:offset+listerLimit]
 			else:
 				readings 			=	ReadingsSensor.objects.filter(node=obj).order_by('-created_at')[offset:offset+listerLimit]
 		else:
@@ -59,7 +60,8 @@ class NodeListSerializer(ModelSerializer):
 			is_many			=	True
 			if len(qstring) > 0:
 				d 			= 	qstring.split('-')
-				readings 			=	ReadingsPower.objects.filter(node=obj, created_at__gte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 0, 0, 0), created_at__lte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 23, 59, 59)).order_by('-created_at')[offset:offset+listerLimit]
+				mos 			= 	int(d[1])+1
+				readings 			=	ReadingsPower.objects.filter(node=obj, created_at__gte=datetime.datetime(int(d[0]), mos, int(d[2]), 0, 0, 0), created_at__lte=datetime.datetime(int(d[0]), mos, int(d[2]), 23, 59, 59)).order_by('-created_at')[offset:offset+listerLimit]
 			else:
 				readings 			=	ReadingsPower.objects.filter(node=obj).order_by('-created_at')[offset:offset+listerLimit]
 		else:
@@ -112,7 +114,8 @@ class NodeRetrieveSerializer(ModelSerializer):
 			is_many			=	True
 			if len(qstring) > 0:
 				d 			= 	qstring.split('-')
-				readings 			=	ReadingsSensor.objects.filter(node=obj, created_at__gte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 0, 0, 0), created_at__lte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 23, 59, 59)).order_by('-created_at')[offset:offset+listerLimit]
+				mos 			= 	int(d[1])+1
+				readings 			=	ReadingsSensor.objects.filter(node=obj, created_at__gte=datetime.datetime(int(d[0]), mos, int(d[2]), 0, 0, 0), created_at__lte=datetime.datetime(int(d[0]), mos, int(d[2]), 23, 59, 59)).order_by('-created_at')[offset:offset+listerLimit]
 			else:
 				readings 			=	ReadingsSensor.objects.filter(node=obj).order_by('-created_at')[offset:offset+listerLimit]
 		else:
@@ -136,7 +139,8 @@ class NodeRetrieveSerializer(ModelSerializer):
 			is_many			=	True
 			if len(qstring) > 0:
 				d 			= 	qstring.split('-')
-				readings 			=	ReadingsPower.objects.filter(node=obj, created_at__gte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 0, 0, 0), created_at__lte=datetime.datetime(int(d[0]), int(d[1]), int(d[2]), 23, 59, 59)).order_by('-created_at')[offset:offset+listerLimit]
+				mos 			= 	int(d[1])+1
+				readings 			=	ReadingsPower.objects.filter(node=obj, created_at__gte=datetime.datetime(int(d[0]), mos, int(d[2]), 0, 0, 0), created_at__lte=datetime.datetime(int(d[0]), mos, int(d[2]), 23, 59, 59)).order_by('-created_at')[offset:offset+listerLimit]
 			else:
 				readings 			=	ReadingsPower.objects.filter(node=obj).order_by('-created_at')[offset:offset+listerLimit]
 		else:

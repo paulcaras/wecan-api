@@ -5,6 +5,7 @@ import decimal
 from django.utils import timezone
 from django.db.models import Q
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -52,7 +53,7 @@ class ReadingSensorViewSets(viewsets.ViewSet):
 	def retrieve(self, request, pk=None):
 		try:
 			queryset = ReadingsSensor.objects.get(pk=pk)
-			serializers = ReadingSensorCreateSerializer(queryset, context={'request':request})
+			serializers = ReadingSensorListSerializer(queryset, context={'request':request})
 			return Response(serializers.data)
 		except:
 			Response(status=status.HTTP_400_BAD_REQUEST)
@@ -101,7 +102,7 @@ class ReadingPowerViewSets(viewsets.ViewSet):
 	def retrieve(self, request, pk=None):
 		try:
 			queryset = ReadingsPower.objects.get(pk=pk)
-			serializers = ReadingPowerCreateSerializer(queryset, context={'request':request})
+			serializers = ReadingPowerListSerializer(queryset, context={'request':request})
 			return Response(serializers.data)
 		except:
 			Response(status=status.HTTP_400_BAD_REQUEST)
@@ -119,11 +120,10 @@ class ReadingPowerViewSets(viewsets.ViewSet):
 
 
 
-
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def read_sensor_post(request, format=None):
-	print(request.data)
 	node = Nodes.objects.get(c_id=request.data['c_id'])
 	if node is not None:
 		parse_data = { 'node': node.id, 'dust': round(request.data['dust'],2) }
@@ -143,11 +143,10 @@ def read_sensor_post(request, format=None):
 	return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def read_power_post(request, format=None):
-	print(request.data)
 	node = Nodes.objects.get(c_id=request.data['c_id'])
 	if node is not None:
 		parse_data = { 'node': node.id, 'power_in': round(request.data['p_in'],2), 'power_ex': round(request.data['p_ex'],2) }
