@@ -5,6 +5,7 @@ from modules.node.models import Nodes
 class ReadingsSensor(models.Model):
 	node 				=	models.ForeignKey(Nodes, on_delete=models.SET_NULL, related_name='node_sensor', null=True)	
 	dust				=	models.DecimalField(decimal_places=2, max_digits=8)
+	stat				=	models.IntegerField(blank=True, default=1)
 	created_at 			= 	models.DateTimeField(auto_now_add=True, blank=True, null=True)
 	updated_at 			= 	models.DateTimeField(auto_now=True, blank=True, null=True)
 

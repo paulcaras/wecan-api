@@ -126,19 +126,30 @@ class ReadingPowerViewSets(viewsets.ViewSet):
 def read_sensor_post(request, format=None):
 	node = Nodes.objects.get(c_id=request.data['c_id'])
 	if node is not None:
-		parse_data = { 'node': node.id, 'dust': round(request.data['dust'],2) }
+		parse_data = { 'node': node.id, 'dust': round(request.data['dist'],2), 'stat': int(request.data['stat'])  }
+		read_last = None
+		try:
+			last_read = ReadingsSensor.objects.filter(node_id=node.id).order_by('-created_at').first()
+		except:
+			pass
 		serializer = ReadingSensorCreateSerializer(data=parse_data)
 		if serializer.is_valid():
 			read = serializer.save()
+			last_notif = None
+			try:
+				last_notif = Notifications.objects.filter(read__node_id=node.id).order_by('-created_at').first()
+			except:
+				pass
 			notif = { 'read': 0 }
-			if float(parse_data['dust']) <= node.bin_offset:
-				notif = { 'read': read.id, 'note_type': 1 }
-			elif parse_data['dust'] >= (float(node.bin_height)*float(0.9)):
-				notif = { 'read': read.id, 'note_type': 2 }
-			if notif['read'] > 0:
-				notifs = NotificationCreateSerializer(data=notif)
-				if notifs.is_valid():
-					notifs.save()
+			if last_read is not None:
+				if last_read.stat == 1 and parse_data['stat'] == 2 and (last_notif is None or (last_notif is not None and last_notif.note_type != 1)):
+					notif = { 'read': read.id, 'note_type': 1 }
+				elif last_read.stat == 2 and parse_data['stat'] == 1 and (last_notif is None or (last_notif is not None and last_notif.note_type != 2)):
+					notif = { 'read': read.id, 'note_type': 2 }
+				if notif['read'] > 0:
+					notifs = NotificationCreateSerializer(data=notif)
+					if notifs.is_valid():
+						notifs.save()
 			return Response(status=status.HTTP_200_OK)
 	return Response(status=status.HTTP_400_BAD_REQUEST)
 
