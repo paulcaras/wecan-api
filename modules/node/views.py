@@ -14,7 +14,8 @@ from rest_framework.request import Request
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404, get_list_or_404
 from modules.node.models import Nodes
-from modules.read.models import ReadingsSensor, ReadingsSensor
+from modules.note.models import Notifications
+from modules.read.models import ReadingsSensor, ReadingsPower
 from modules.serializers import NodeCreateSerializer, NodeListSerializer, NodeRetrieveSerializer
 
 class NodesViewSets(viewsets.ViewSet):
@@ -72,7 +73,14 @@ class NodesViewSets(viewsets.ViewSet):
 
 
 	def destroy(self, request, pk=None):
-		pass
+		#try:
+		Notifications.objects.filter(read__node_id=pk).delete()
+		ReadingsSensor.objects.filter(node_id=pk).delete()
+		ReadingsPower.objects.filter(node_id=pk).delete()
+		Nodes.objects.filter(id=pk).delete()
+		#except:
+		#	pass
+		return Response(status=status.HTTP_201_CREATED)
 
 
 @csrf_exempt

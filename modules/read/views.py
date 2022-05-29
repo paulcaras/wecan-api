@@ -126,7 +126,7 @@ class ReadingPowerViewSets(viewsets.ViewSet):
 def read_sensor_post(request, format=None):
 	node = Nodes.objects.get(c_id=request.data['c_id'])
 	if node is not None:
-		parse_data = { 'node': node.id, 'dust': round(request.data['dist'],2), 'stat': int(request.data['stat'])  }
+		parse_data = { 'node': node.id, 'dust1': round(request.data['dis1'],2), 'dust2': round(request.data['dis2'],2), 'stat': int(request.data['stat'])  }
 		read_last = None
 		try:
 			last_read = ReadingsSensor.objects.filter(node_id=node.id).order_by('-created_at').first()
