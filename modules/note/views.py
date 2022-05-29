@@ -29,7 +29,7 @@ class NotesViewSets(viewsets.ViewSet):
 		offset 				= 	listerStart*listerLimit
 		notes = {}
 		if qaction == 'lister':
-			notes = Notifications.objects.all().order_by('-added_at')[offset:offset+listerLimit]
+			notes = Notifications.objects.all().order_by('-created_at')[offset:offset+listerLimit]
 		serializers = NotificationListSerializer(notes, many=True, context={'request':request})
 		return Response(serializers.data)
 
